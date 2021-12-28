@@ -7,7 +7,7 @@ from pygame.locals import *
 
 screenzize = (640, 640)
 print(os.getcwd())
-picture_root_dir = os.path.join(os.getcwd(), 'resources/Islamic_pics')#to acsses the folder and the picture in that folder
+picture_root_dir = os.path.join(os.getcwd(), 'resources/pictures')
 fontpath = os.path.join(os.getcwd(), 'resources/font/FZSTK.TTF')
 marshallah_song = os.path.join(os.getcwd(), 'resources/music/Mashallah Brother!.mp3')
 victory_nasheed = os.path.join(os.getcwd(), 'resources/music/Victory_nasheed.mp3')
@@ -24,4 +24,4 @@ black_colour = (0, 0, 0)
 
 FPS = 40
 
-random = 100 # to reffer to the pictures so the user dont expect what picture he is goin to see
+random = 100
