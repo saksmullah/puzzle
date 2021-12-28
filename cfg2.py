@@ -1,16 +1,22 @@
+'''
+Created on Mar 30, 2021
+
+@author: martinyanev
+'''
 import os
-import pygame
 
-screenzize = (640, 640)
-picture_root_dir = os.path.join(os.getcwd(), 'Game5_Puzzle/resources/pictures')#to acsses the folder and the picture in that folder
-fontpath = os.path.join(os.getcwd(), 'Game5_Puzzle/resources/font/FZSTK.TTF')
-song = os.path.join(os.getcwd(), 'Game5_Puzzle/resources/music/Ezio.mp3' )
+SCREENSIZE = (640, 640)
 
-background_colour = (255, 255, 255)
-red_colour = (255, 0, 0)
-blue_colour = (0, 0, 255)
-black_colour = (0, 0, 0)
+song = os.path.join(os.getcwd(), 'resources/music/Ezio.mp3' ) #adding music to the game
+PICTURE_ROOT_DIR = os.path.join(os.getcwd(), 'resources/pictures')
+
+FONTPATH = os.path.join(os.getcwd(), 'resources/font/FZSTK.TTF')
+
+BACKGROUNDCOLOR = (255, 255, 255)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
 
 FPS = 40
 
-random = 100 # to reffer to the pictures so the user dont expect what picture he is goin to see
+RANDNUM = 100

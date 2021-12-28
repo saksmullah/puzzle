@@ -1,151 +1,232 @@
+'''
+Created on Mar 30, 2021
+
+@author: martinyanev
+'''
+
 import os
 import sys
 import cfg2
-import random #/ to choose our picture randomly in the puzzle game
+import random
 import pygame
 
 
-
-def is_game_over(board, size):
-   if not isinstance(size, int):  #check if the game size is the right type
-      return True
-   num_cells = size * size #multiplying the vertical to the horizontal size to get total number of cells
-   for i in range(num_cells - 1):
-      if board[i] != i: False #this checks if the cell and the board is not equal to the actual cell, it should be false
-   return True #if every cell was in the right place, it should return True
+def isGameOver(board, size):
+    assert isinstance(size, int)
+    num_cells = size * size
+    for i in range(num_cells - 1):
+        if board[i] != i: return False
+    return True
 
 
- #what this function moveRigt on the bottom do that the piece from the left, moves to the right and the left
-# one is empty
-def moveRight(board, blank_cell_index, num_of_coloums):
-   if blank_cell_index % num_of_coloums == 0:#when you divide blank cell index to the number of colums,
-      # your not getting anything left, then you return true
-      return blank_cell_index
-   board[blank_cell_index-1] = board[blank_cell_index]
-   board[blank_cell_index] = board[blank_cell_index-1]
-   return blank_cell_index - 1
-
-def moveLeft(board, blank_cell_index, num_of_coloums):
-   if (blank_cell_index +1) % num_of_coloums == 0:
-      return blank_cell_index
-   board[blank_cell_index + 1] = board[blank_cell_index]
-   board[blank_cell_index] = board[blank_cell_index+1]
-   return blank_cell_index + 1
-
-def moveDown(board, blank_cell_index, num_of_coloums):
-   if blank_cell_index < num_of_coloums: #checking if the blank cell index is smaller then the number of coloums
-      return blank_cell_index
-   board[blank_cell_index - num_of_coloums] = board[blank_cell_index]
-   board[blank_cell_index] = board[blank_cell_index - num_of_coloums]
-   return blank_cell_index - num_of_coloums
+def moveR(board, blank_cell_idx, num_cols):
+    if blank_cell_idx % num_cols == 0: return blank_cell_idx
+    board[blank_cell_idx - 1], board[blank_cell_idx] = board[blank_cell_idx], board[blank_cell_idx - 1]
+    return blank_cell_idx - 1
 
 
-def moveUp(board, blank_cell_index, num_rows, num_of_coloums):
-   if blank_cell_index >= (num_rows - 1) * num_of_coloums:
-      return blank_cell_index
-   board[blank_cell_index + num_of_coloums] = board[blank_cell_index]
-   board[blank_cell_index] = board[blank_cell_index + num_of_coloums]
-   return blank_cell_index + num_of_coloums
-
-def createboard(number_of_rows, number_of_coloums, number_of_cells):
-   board = []
-
-   for i in range(number_of_cells): board.append(i)
-
-   blank_cell_index = number_of_cells - 1
-   board[blank_cell_index] = -1
-
-   for i in range(cfg2.random):#this is the file made from the cfg file and random is 100 as our range
-      direction = random.randint(0, 3)
-
-      if direction == 0: blank_cell_index = moveLeft(board, blank_cell_index, number_of_coloums)
-      elif direction == 1: blank_cell_index = moveRight(board,blank_cell_index, number_of_coloums)
-      elif direction == 2: blank_cell_index = moveUp(board,blank_cell_index,number_of_rows, number_of_coloums)
-      elif direction == 3: blank_cell_index = moveDown(board, blank_cell_index, number_of_coloums)
-
-   return board, blank_cell_index
-
-def get_images_path(rootdir):
-   image_names = os.listdir(rootdir)
-   assert len(image_names) > 0
-   return os.path.join(rootdir, random.choice(image_names))
+def moveL(board, blank_cell_idx, num_cols):
+    if (blank_cell_idx + 1) % num_cols == 0: return blank_cell_idx
+    board[blank_cell_idx + 1], board[blank_cell_idx] = board[blank_cell_idx], board[blank_cell_idx + 1]
+    return blank_cell_idx + 1
 
 
-def show_interface(screen, width, height):
-   screen.fill(cfg2.background_colour)
-   font = pygame.font.Font(cfg2.fontpath, width/15)
-   title = font.render('good job! you won!', True, (233, 150, 122))
-   rect = title.get_rect()
-   rect.midtop = (width/2, height/2.5)
-   screen.blit(title, rect) #to draw images to the screen
-   pygame.display.update()
-   while True:
-      for event in pygame.event.get():
-         if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            pygame.quit()
-            sys.exit()
-      pygame.display.update()
+def moveD(board, blank_cell_idx, num_cols):
+    if blank_cell_idx < num_cols: return blank_cell_idx
+    board[blank_cell_idx - num_cols], board[blank_cell_idx] = board[blank_cell_idx], board[blank_cell_idx - num_cols]
+    return blank_cell_idx - num_cols
 
-def show_start_interface(screen, width, height):
-   screen.fill(cfg2.background_colour)
-   t_font = pygame.font.Font(cfg2.fontpath, width // 4)
-   c_font = pygame.font.Font(cfg2.fontpath, width // 20)
-   title = t_font.render('Puzzle', True, cfg2.red_colour)
-   content_1 = c_font.render("Press H, M or L to choose your puzzle", True, cfg2.blue_colour)
-   content_2 = c_font.render("H - 5x5, M - 4x4, L - 3x3", True, cfg2.blue_colour)
-   t_rect = title.get_rect()
-   t_rect.midtop = (width / 2, height / 10)
-   c_rect1 = content_1.get_rect()
-   c_rect1.midtop = (width / 2, height / 2.2)
-   c_rect2 = content_2.get_rect()
-   c_rect2.midtop = (width / 2, height / 1.8)
-   screen.blit(title, t_rect)
-   screen.blit(content_1, c_rect1)
-   screen.blit(content_2, c_rect2)
-   while True:
-      for event in pygame.event.get():
-         if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            pygame.quit()
-            sys.exit()
-         elif event.type == pygame.KEYDOWN:
-            if event.key == ord('L'): return 3
-            elif event.key == ord('M'): return 4
-            elif event.key == ord('H'): return 5
-      pygame.display.update()
+
+def moveU(board, blank_cell_idx, num_rows, num_cols):
+    if blank_cell_idx >= (num_rows - 1) * num_cols:
+        return blank_cell_idx
+    board[blank_cell_idx + num_cols], board[blank_cell_idx] = board[blank_cell_idx], board[blank_cell_idx + num_cols]
+    return blank_cell_idx + num_cols
+
+
+def CreateBoard(num_rows, num_cols, num_cells):
+    board = []
+    for i in range(num_cells): board.append(i)
+
+    blank_cell_idx = num_cells - 1
+    board[blank_cell_idx] = -1
+    for i in range(cfg2.RANDNUM):
+
+        direction = random.randint(0, 3)
+        if direction == 0:
+            blank_cell_idx = moveL(board, blank_cell_idx, num_cols)
+        elif direction == 1:
+            blank_cell_idx = moveR(board, blank_cell_idx, num_cols)
+        elif direction == 2:
+            blank_cell_idx = moveU(board, blank_cell_idx, num_rows, num_cols)
+        elif direction == 3:
+            blank_cell_idx = moveD(board, blank_cell_idx, num_cols)
+    return board, blank_cell_idx
+
+
+def GetImagePath(rootdir):
+    imagenames = os.listdir(rootdir)
+    assert len(imagenames) > 0
+    return os.path.join(rootdir, random.choice(imagenames))
+
+
+def ShowEndInterface(screen, width, height):
+    screen.fill(cfg2.BACKGROUNDCOLOR)
+    font = pygame.font.Font(cfg2.FONTPATH, width // 15)
+    title = font.render('Good Job! You Won!', True, (233, 150, 122))
+    rect = title.get_rect()
+    rect.midtop = (width / 2, height / 2.5)
+    screen.blit(title, rect)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+        pygame.display.update()
+
+
+def ShowStartInterface(screen, width, height):
+    screen.fill(cfg2.BACKGROUNDCOLOR)
+    tfont = pygame.font.Font(cfg2.FONTPATH, width // 4)
+    cfont = pygame.font.Font(cfg2.FONTPATH, width // 20)
+    title = tfont.render('Puzzle', True, cfg2.RED)
+    content1 = cfont.render("Press H, M or L to choose your puzzle", True, cfg2.BLUE)
+    content2 = cfont.render('H - 5x5, M - 4x4, L - 3x3', True, cfg2.BLUE)
+    trect = title.get_rect()
+    trect.midtop = (width / 2, height / 10)
+    crect1 = content1.get_rect()
+    crect1.midtop = (width / 2, height / 2.2)
+    crect2 = content2.get_rect()
+    crect2.midtop = (width / 2, height / 1.8)
+    screen.blit(title, trect)
+    screen.blit(content1, crect1)
+    screen.blit(content2, crect2)
+    while True:
+        for event in pygame.event.get():
+            if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == ord('l'):
+                    return 3
+                elif event.key == ord('m'):
+                    return 4
+                elif event.key == ord('h'):
+                    return 5
+        pygame.display.update()
+
+
+
+
 
 def main():
-   pygame.mixer.init()
-   pygame.mixer.music.load(cfg2.song)
-   pygame.mixer.music.play(-1)
-   pygame.init()
-   clock = pygame.time.Clock()
+    pygame.init()
+    clock = pygame.time.Clock()
+    # 加载图片
+    game_img_used = pygame.image.load(GetImagePath(cfg2.PICTURE_ROOT_DIR))
+    game_img_used = pygame.transform.scale(game_img_used, cfg2.SCREENSIZE)
+    game_img_used_rect = game_img_used.get_rect()
+    # 设置窗口
+    screen = pygame.display.set_mode(cfg2.SCREENSIZE)
+    pygame.display.set_caption('Pokemon')
+    # 游戏开始界面
+    size = ShowStartInterface(screen, game_img_used_rect.width, game_img_used_rect.height)
+    assert isinstance(size, int)
+    num_rows, num_cols = size, size
+    num_cells = size * size
+    # 计算Cell大小
+    cell_width = game_img_used_rect.width // num_cols
+    cell_height = game_img_used_rect.height // num_rows
+    # 避免初始化为原图
+    while True:
+        game_board, blank_cell_idx = CreateBoard(num_rows, num_cols, num_cells)
+        if not isGameOver(game_board, size):
+            break
+    # 游戏主循环
+    is_running = True
+    while is_running:
+        # --事件捕获
+        for event in pygame.event.get():
+            # ----退出游戏
+            if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            # ----键盘操作
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT or event.key == ord('a'):
+                    blank_cell_idx = moveL(game_board, blank_cell_idx, num_cols)
+                elif event.key == pygame.K_RIGHT or event.key == ord('d'):
+                    blank_cell_idx = moveR(game_board, blank_cell_idx, num_cols)
+                elif event.key == pygame.K_UP or event.key == ord('w'):
+                    blank_cell_idx = moveU(game_board, blank_cell_idx, num_rows, num_cols)
+                elif event.key == pygame.K_DOWN or event.key == ord('s'):
+                    blank_cell_idx = moveD(game_board, blank_cell_idx, num_cols)
+
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                x, y = pygame.mouse.get_pos()
+                x_pos = x // cell_width
+                y_pos = y // cell_height
+                idx = x_pos + y_pos * num_cols
+                if idx == blank_cell_idx - 1:
+                    blank_cell_idx = moveR(game_board, blank_cell_idx, num_cols)
+                elif idx == blank_cell_idx + 1:
+                    blank_cell_idx = moveL(game_board, blank_cell_idx, num_cols)
+                elif idx == blank_cell_idx + num_cols:
+                    blank_cell_idx = moveU(game_board, blank_cell_idx, num_rows, num_cols)
+                elif idx == blank_cell_idx - num_cols:
+                    blank_cell_idx = moveD(game_board, blank_cell_idx, num_cols)
+
+        if isGameOver(game_board, size):
+            game_board[blank_cell_idx] = num_cells - 1
+            is_running = False
+
+        screen.fill(cfg2.BACKGROUNDCOLOR)
+        for i in range(num_cells):
+            if game_board[i] == -1:
+                continue
+            x_pos = i // num_cols
+            y_pos = i % num_cols
+            rect = pygame.Rect(y_pos * cell_width, x_pos * cell_height, cell_width, cell_height)
+            img_area = pygame.Rect((game_board[i] % num_cols) * cell_width, (game_board[i] // num_cols) * cell_height,
+                                   cell_width, cell_height)
+            screen.blit(game_img_used, rect, img_area)
+        for i in range(num_cols + 1):
+            pygame.draw.line(screen, cfg2.BLACK, (i * cell_width, 0), (i * cell_width, game_img_used_rect.height))
+        for i in range(num_rows + 1):
+            pygame.draw.line(screen, cfg2.BLACK, (0, i * cell_height), (game_img_used_rect.width, i * cell_height))
+        pygame.display.update()
+        clock.tick(cfg2.FPS)
+
+    ShowEndInterface(screen, game_img_used_rect.width, game_img_used_rect.height)
 
 
-   game_image_used = pygame.image.load(get_images_path(cfg2.picture_root_dir))
-   game_image_used = pygame.transform.scale(game_image_used, cfg2.screenzize)
-   game_image_used_rect = game_image_used.get_rect()
-
-   screen = pygame.display.set_mode(cfg2.screenzize)
-   pygame.display.set_caption('Pokemon')
-
-   size = show_start_interface(screen, game_image_used_rect.width, game_image_used_rect.height)
-   assert isinstance(size, int)
-   number_rows, number_coloums = size,size
-   number_cells = size * size
-
-   cell_width = game_image_used_rect.width//number_coloums
-   cell_height = game_image_used_rect.height//number_rows
+'''run'''
+if __name__ == '__main__':
+    main()
 
 
 
-   while True:
-      game_board, blank_cell_index = createboard(number_rows, number_coloums, number_cells)
-      if not is_game_over(game_board,size):
-         break
-
-   is_running = True
 
 
-if __name__ == "__main__":
-   main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
